@@ -55,7 +55,10 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExcess> filteredByStreams(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         Map<LocalDate, Integer> sumOfCaloriesByDay = meals.stream()
-                .collect(Collectors.groupingBy(userMeal -> userMeal.getDateTime().toLocalDate(), Collectors.summingInt(UserMeal::getCalories)));
+                .collect(Collectors.groupingBy(
+                        userMeal -> userMeal.getDateTime().toLocalDate(),
+                        Collectors.summingInt(UserMeal::getCalories))
+                );
         return meals.stream()
                 .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime))
                 .map(userMeal -> new UserMealWithExcess(
@@ -67,14 +70,15 @@ public class UserMealsUtil {
     }
 
     public static List<UserMealWithExcess> filteredByStreams2(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
-        return meals.stream().collect(Collectors.groupingBy(userMeal -> userMeal.getDateTime().toLocalDate())).values().stream()
-                .flatMap(userMeals -> userMeals.stream().map(userMeal -> {
+        return meals.stream().collect(Collectors.groupingBy(userMeal -> userMeal.getDateTime().toLocalDate()))
+                .values().stream().flatMap(userMeals -> userMeals.stream().map(userMeal -> {
+                            int realCaloriesPerDay = (userMeals.stream().mapToInt(UserMeal::getCalories).sum());
                             if (TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime)) {
                                 return new UserMealWithExcess(
                                         userMeal.getDateTime(),
                                         userMeal.getDescription(),
                                         userMeal.getCalories(),
-                                        (userMeals.stream().mapToInt(UserMeal::getCalories).sum() > caloriesPerDay)
+                                        (realCaloriesPerDay > caloriesPerDay)
                                 );
                             }
                             return null;
