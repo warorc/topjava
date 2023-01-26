@@ -12,10 +12,22 @@ import java.util.stream.Collectors;
 
 public class UserMealsUtil {
     public static void main(String[] args) {
+//        List<UserMeal> meals = Arrays.asList(
+//                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
+//                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
+//                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
+//                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
+//                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
+//                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
+//                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410));
+
         List<UserMeal> meals = Arrays.asList(
                 new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
                 new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
                 new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 30, 20, 0), "Ужин", 500),
+                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 29, 10, 0), "Завтрак", 500),
+                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 29, 13, 0), "Обед", 1000),
+                new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 29, 20, 0), "Ужин", 500),
                 new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 0, 0), "Еда на граничное значение", 100),
                 new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 10, 0), "Завтрак", 1000),
                 new UserMeal(LocalDateTime.of(2020, Month.JANUARY, 31, 13, 0), "Обед", 500),
@@ -71,17 +83,18 @@ public class UserMealsUtil {
 
     public static List<UserMealWithExcess> filteredByStreams2(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
         return meals.stream().collect(Collectors.groupingBy(userMeal -> userMeal.getDateTime().toLocalDate()))
-                .entrySet().stream()
-                .collect(Collectors.toMap(localDateListEntry ->
-                        localDateListEntry.getValue().stream().mapToInt(UserMeal::getCalories).sum(), Map.Entry::getValue))
+                .values().stream()
+                .collect(Collectors.groupingBy(userMeals ->
+                        userMeals.stream().mapToInt(UserMeal::getCalories).sum() > caloriesPerDay))
                 .entrySet().stream()
                 .flatMap(integerListEntry -> integerListEntry.getValue().stream()
+                        .flatMap(Collection::stream)
                         .filter(userMeal -> TimeUtil.isBetweenHalfOpen(userMeal.getDateTime().toLocalTime(), startTime, endTime))
                         .map(userMeal -> new UserMealWithExcess(
                                         userMeal.getDateTime(),
                                         userMeal.getDescription(),
                                         userMeal.getCalories(),
-                                        (integerListEntry.getKey() > caloriesPerDay)
+                                        (integerListEntry.getKey())
                                 )
                         )
                 ).collect(Collectors.toList());
