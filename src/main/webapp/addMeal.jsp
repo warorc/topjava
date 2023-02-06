@@ -36,13 +36,13 @@
         <label>Meal Description:</label>
         <input
                 type="text" name="description"
-                value="<c:out value="${meal.description}" />"/> <br/>
+                value="${meal.description}"/> <br/>
     </div>
     <div class="field">
         <label>Meal calories:</label>
         <input
-                type="text" name="calories"
-                value="<c:out value="${meal.calories}" />"/> <br/>
+                type="number" name="calories"
+                value="${meal.calories}"/> <br/>
     </div>
     <p/>
     <input type="submit" value="Submit"/>

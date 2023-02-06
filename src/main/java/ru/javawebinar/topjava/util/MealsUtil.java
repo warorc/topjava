@@ -34,13 +34,13 @@ public class MealsUtil {
                         Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
 //                      Collectors.toMap(Meal::getDate, Meal::getCalories, Integer::sum)
                 );
-        if (startTime == null && endTime == null) {
-            return meals.stream()
-                    .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
-                    .collect(Collectors.toList());
-        }
         return meals.stream()
-                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime))
+                .filter(meal -> {
+                    if (startTime == null && endTime == null) {
+                        return true;
+                    }
+                    return TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime);
+                })
                 .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
     }

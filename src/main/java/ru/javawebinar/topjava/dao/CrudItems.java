@@ -3,14 +3,13 @@ package ru.javawebinar.topjava.dao;
 import java.util.List;
 
 public interface CrudItems<T> {
-    List<T> getAllItems();
+    List<T> getAll();
 
-    void addItem(T item);
+    T add(T item);
 
-    void deleteItem(int itemId);
+    void delete(int id);
 
-    void editItem(T editedItem);
+    T update(T updatedItem);
 
-    T getItemById(Integer id);
-
+    T getById(int id);
 }
