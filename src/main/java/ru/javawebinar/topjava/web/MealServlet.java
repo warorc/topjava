@@ -1,8 +1,8 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
-import ru.javawebinar.topjava.dao.CrudItems;
-import ru.javawebinar.topjava.dao.MemoryMeal;
+import ru.javawebinar.topjava.dao.Dao;
+import ru.javawebinar.topjava.dao.MemoryMealDao;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -13,18 +13,18 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
-    private CrudItems<Meal> memoryMeal;
+    private Dao<Meal> memoryMeal;
+    private static final int CALORIES_PER_DAY = 2000;
 
     @Override
     public void init() {
-        memoryMeal = new MemoryMeal();
+        memoryMeal = new MemoryMealDao();
     }
 
     @Override
@@ -57,7 +57,7 @@ public class MealServlet extends HttpServlet {
             forward = "/meals.jsp";
             request.setAttribute(
                     "mealsTo",
-                    MealsUtil.filteredByStreams((List<Meal>) memoryMeal.getAll(), null, null, 2000)
+                    MealsUtil.filteredByStreams(memoryMeal.getAll(), null, null, CALORIES_PER_DAY)
             );
             RequestDispatcher view = request.getRequestDispatcher(forward);
             view.forward(request, response);
@@ -73,8 +73,7 @@ public class MealServlet extends HttpServlet {
         if (request.getParameter("id") != null && !request.getParameter("id").isEmpty()) {
             id = Integer.parseInt(request.getParameter("id"));
         }
-        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-        LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"), dtf);
+        LocalDateTime dateTime = LocalDateTime.parse(request.getParameter("dateTime"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
         Meal meal = new Meal(id, dateTime, description, calories);

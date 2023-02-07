@@ -2,7 +2,7 @@ package ru.javawebinar.topjava.dao;
 
 import java.util.List;
 
-public interface CrudItems<T> {
+public interface Dao<T> {
     List<T> getAll();
 
     T add(T item);
