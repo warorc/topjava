@@ -11,7 +11,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MemoryMealDao implements Dao<Meal> {
     private final Map<Integer, Meal> mapOfMeals = new ConcurrentHashMap<>();
 
-    public final AtomicInteger counter = new AtomicInteger(0);
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     public MemoryMealDao() {
         List<Meal> meals = Arrays.asList(
@@ -45,8 +45,7 @@ public class MemoryMealDao implements Dao<Meal> {
     @Override
     public Meal update(Meal updatedMeal) {
         int id = updatedMeal.getId();
-        if (mapOfMeals.containsKey(id)) {
-            mapOfMeals.put(id, updatedMeal);
+        if (mapOfMeals.replace(id, mapOfMeals.get(id), updatedMeal)) {
             return updatedMeal;
         }
         return null;
