@@ -10,7 +10,7 @@ import ru.javawebinar.topjava.to.MealTo;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.Filter;
 
-import java.util.Collection;
+import java.util.List;
 
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
 import static ru.javawebinar.topjava.web.SecurityUtil.authUserCaloriesPerDay;
@@ -19,24 +19,20 @@ import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
 
 @Controller
 public class MealRestController {
-    protected final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private MealService service;
 
-    public Collection<Meal> getAll() {
-        log.info("Rest controller getAll");
-        return service.getAll(authUserId());
-    }
 
-    public Collection<MealTo> getAllTos() {
+    public List<MealTo> getAll() {
         log.info("Rest controller get all Meal Transfer Object");
-        return MealsUtil.getTos(getAll(), authUserCaloriesPerDay());
+        return MealsUtil.getTos(service.getAll(authUserId()), authUserCaloriesPerDay());
     }
 
-    public Collection<MealTo> getAllFilteredTos(Filter filter) {
+    public List<MealTo> getAllFilteredTos(Filter filter) {
         log.info("Rest controller get all Meal Transfer Object filtered by dates and times");
-        return MealsUtil.getTos(service.getAllFilteredByDateAndTime(authUserId(), filter), authUserCaloriesPerDay());
+        return MealsUtil.getFilteredTos(service.getAllFilteredByDate(authUserId(), filter), authUserCaloriesPerDay(), filter.getStartTime(), filter.getEndTime());
     }
 
     public Meal get(int id) {

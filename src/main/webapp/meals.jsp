@@ -27,7 +27,7 @@
     <h2>Meals</h2>
     <a href="meals?action=create">Add Meal</a>
     <br><br>
-    <form method="post" action="meals">
+    <form method="GET" action="meals">
         <dl class="line">
             <dt>Start date:</dt>
             <dd><input type="date" value="${filter.startDate.toLocalDate()}" name="startDate"></dd>

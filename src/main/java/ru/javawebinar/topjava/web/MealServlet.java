@@ -37,48 +37,25 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         request.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");
-        switch (action) {
-            case "save":
-                String id = request.getParameter("id");
-                Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                        LocalDateTime.parse(request.getParameter("dateTime")),
-                        request.getParameter("description"),
-                        Integer.parseInt(request.getParameter("calories")));
+        String id = request.getParameter("id");
+        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
+                LocalDateTime.parse(request.getParameter("dateTime")),
+                request.getParameter("description"),
+                Integer.parseInt(request.getParameter("calories")));
 
-                log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-                if (meal.isNew())
-                    mealRestController.create(meal);
-                else
-                    mealRestController.update(meal, Integer.parseInt(id));
-                response.sendRedirect("meals");
-                break;
-            case "filter":
-                LocalDateTime startDate = request.getParameter("startDate").isEmpty()
-                        ? null
-                        : LocalDate.parse(request.getParameter("startDate")).atStartOfDay();
-                LocalDateTime endDate = request.getParameter("endDate").isEmpty()
-                        ? null
-                        : LocalDate.parse(request.getParameter("endDate")).atStartOfDay();
-                LocalTime startTime = request.getParameter("startTime").isEmpty()
-                        ? null
-                        : LocalTime.parse(request.getParameter("startTime"));
-                LocalTime endTime = request.getParameter("endTime").isEmpty()
-                        ? null
-                        : LocalTime.parse(request.getParameter("endTime"));
-                Filter filter = new Filter(startDate, endDate, startTime, endTime);
-                request.setAttribute("filter", filter);
-                request.setAttribute("meals",
-                        mealRestController.getAllFilteredTos(filter));
-                request.getRequestDispatcher("/meals.jsp").forward(request, response);
-                break;
-        }
+        log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
+        if (meal.isNew())
+            mealRestController.create(meal);
+        else
+            mealRestController.update(meal, Integer.parseInt(id));
+        response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws
             ServletException, IOException {
         String action = request.getParameter("action");
+        Filter filter = new Filter();
 
         switch (action == null ? "all" : action) {
             case "delete":
@@ -95,10 +72,28 @@ public class MealServlet extends HttpServlet {
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealForm.jsp").forward(request, response);
                 break;
+            case "filter":
+                LocalDateTime startDate = request.getParameter("startDate").isEmpty()
+                        ? null
+                        : LocalDate.parse(request.getParameter("startDate")).atStartOfDay();
+                LocalDateTime endDate = request.getParameter("endDate").isEmpty()
+                        ? null
+                        : LocalDate.parse(request.getParameter("endDate")).atStartOfDay();
+                LocalTime startTime = request.getParameter("startTime").isEmpty()
+                        ? null
+                        : LocalTime.parse(request.getParameter("startTime"));
+                LocalTime endTime = request.getParameter("endTime").isEmpty()
+                        ? null
+                        : LocalTime.parse(request.getParameter("endTime"));
+                filter = new Filter(startDate, endDate, startTime, endTime);
+                request.setAttribute("filter", filter);
+                request.setAttribute("meals",
+                        mealRestController.getAllFilteredTos(filter));
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                break;
             case "all":
             default:
                 log.info("getAll");
-                Filter filter = new Filter();
                 request.setAttribute("filter", filter);
                 request.setAttribute("meals",
                         mealRestController.getAllFilteredTos(filter));

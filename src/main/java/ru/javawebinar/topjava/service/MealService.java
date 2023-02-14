@@ -6,7 +6,7 @@ import ru.javawebinar.topjava.repository.MealRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.Filter;
 
-import java.util.Collection;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNotFoundWithId;
 
@@ -17,7 +17,8 @@ public class MealService {
 
     public MealService(MealRepository repository) {
         this.repository = repository;
-        MealsUtil.meals.forEach(meal -> create(meal, 1));
+        MealsUtil.mealsUser.forEach(meal -> create(meal, 1));
+        MealsUtil.mealsAdmin.forEach(meal -> create(meal, 2));
     }
 
     public Meal create(Meal meal, int userId) {
@@ -32,12 +33,16 @@ public class MealService {
         return checkNotFoundWithId(repository.get(id, userId), id);
     }
 
-    public Collection<Meal> getAll(int userId) {
+    public List<Meal> getAll(int userId) {
         return repository.getAll(userId);
     }
 
-    public Collection<Meal> getAllFilteredByDateAndTime(int userId, Filter filter) {
-        return (repository.getAllFilteredByDateAndTime(userId, filter));
+    public List<Meal> getAllFilteredByDate(int userId, Filter filter) {
+        return (repository.getAllFilteredByDate(
+                userId,
+                filter.getStartDate(),
+                filter.getEndDate()
+        ));
     }
 
     public void update(Meal meal, int userId) {
