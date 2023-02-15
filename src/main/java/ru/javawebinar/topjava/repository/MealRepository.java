@@ -1,11 +1,8 @@
 package ru.javawebinar.topjava.repository;
 
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.web.Filter;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.Collection;
 import java.util.List;
 
 public interface MealRepository {

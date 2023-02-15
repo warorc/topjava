@@ -1,5 +1,6 @@
 package ru.javawebinar.topjava.web;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
@@ -12,9 +13,9 @@ public class Filter {
     public Filter() {
     }
 
-    public Filter(LocalDateTime startDate, LocalDateTime endDate, LocalTime startTime, LocalTime endTime) {
-        this.startDate = startDate;
-        this.endDate = endDate;
+    public Filter(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        this.startDate = startDate != null ? startDate.atStartOfDay() : null;
+        this.endDate = endDate != null ? endDate.atStartOfDay() : null;
         this.startTime = startTime;
         this.endTime = endTime;
     }
