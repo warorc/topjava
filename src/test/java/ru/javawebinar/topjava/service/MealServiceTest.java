@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.service;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -14,7 +13,6 @@ import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
@@ -39,7 +37,7 @@ public class MealServiceTest {
 
     @Test
     public void get() {
-        Meal meal = service.get(MEAL_ID_USER, USER_ID);
+        Meal meal = service.get(USER_MEAL_ID, USER_ID);
         assertMatch(meal, userMealBreakfastFeb02);
     }
 
@@ -50,30 +48,43 @@ public class MealServiceTest {
 
     @Test
     public void getFromAnotherUser() {
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID_ADMIN, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.get(ADMIN_MEAL_ID, USER_ID));
     }
 
     @Test
     public void delete() {
-        service.delete(MEAL_ID_USER, USER_ID);
-        assertThrows(NotFoundException.class, () -> service.get(MEAL_ID_USER, USER_ID));
+        service.delete(USER_MEAL_ID, USER_ID);
+        assertThrows(NotFoundException.class, () -> service.get(USER_MEAL_ID, USER_ID));
     }
 
     @Test
     public void deleteNotExisted() {
-        assertThrows(NotFoundException.class, ()->service.delete(NOT_FOUND, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.delete(NOT_FOUND, USER_ID));
 
     }
 
     @Test
     public void deleteForAnotherUser() {
-        assertThrows(NotFoundException.class, ()->service.delete(MEAL_ID_ADMIN, USER_ID));
+        assertThrows(NotFoundException.class, () -> service.delete(ADMIN_MEAL_ID, USER_ID));
     }
 
     @Test
     public void getBetweenInclusive() {
-        List<Meal> betweenDates = service.getBetweenInclusive(LocalDate.parse("2023-02-03"), LocalDate.parse("2023-02-03"), USER_ID);
+        List<Meal> betweenDates = service.getBetweenInclusive(LocalDate.of(2023, 2, 3), LocalDate.of(2023, 2, 3), USER_ID);
         assertMatch(betweenDates, userMealDinnerFeb03, userMealLunchFeb03, userMealBreakfastFeb03, userMealBorderFeb03);
+    }
+
+    @Test
+    public void openDateTimeBorders() {
+        List<Meal> betweenDates = service.getBetweenInclusive(null, null, USER_ID);
+        assertMatch(betweenDates, userMealDinnerFeb03,
+                userMealLunchFeb03,
+                userMealBreakfastFeb03,
+                userMealBorderFeb03,
+                userMealDinnerFeb02,
+                userMealLunchFeb02,
+                userMealBreakfastFeb02
+        );
     }
 
     @Test
@@ -95,7 +106,7 @@ public class MealServiceTest {
     public void update() {
         Meal updated = getUpdated();
         service.update(updated, USER_ID);
-        assertMatch(service.get(MEAL_ID_USER, USER_ID), updated);
+        assertMatch(service.get(USER_MEAL_ID, USER_ID), getUpdated());
     }
 
     @Test
@@ -124,7 +135,7 @@ public class MealServiceTest {
                 service.create(
                         new Meal(
                                 null,
-                                LocalDateTime.parse("2023-02-02T10:00:00"),
+                                userMealBreakfastFeb02.getDateTime(),
                                 "Duplicate DateTime User Завтрак",
                                 1000
                         ),
