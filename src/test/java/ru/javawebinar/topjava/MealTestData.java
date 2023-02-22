@@ -104,7 +104,7 @@ public class MealTestData {
 
     public static Meal getUpdated() {
         Meal updated = new Meal(userMealBreakfastFeb02);
-        updated.setDateTime(LocalDateTime.now());
+        updated.setDateTime(LocalDateTime.of(2023, 2, 5, 20, 0));
         updated.setDescription("Updated Завтрак User");
         updated.setCalories(100);
         return updated;
@@ -113,7 +113,7 @@ public class MealTestData {
     public static Meal getUpdatedNotExisted() {
         Meal updated = new Meal(userMealBreakfastFeb02);
         updated.setId(NOT_FOUND);
-        updated.setDateTime(LocalDateTime.now());
+        updated.setDateTime(LocalDateTime.of(2023, 2, 5, 20, 0));
         updated.setDescription("Updated Завтрак User");
         updated.setCalories(100);
         return updated;

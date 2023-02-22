@@ -3,7 +3,20 @@
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
 
+
+    <bean class="ru.javawebinar.topjava.service.MealService" id="mealService">
+    </bean>
+
+    <bean class="ru.javawebinar.topjava.service.UserService" id="userService">
+    </bean>
+
+    <bean class="ru.javawebinar.topjava.web.meal.MealRestController" id="mealRestController">
+        <constructor-arg ref="mealService"/>
+    </bean>
+
+    <bean class="ru.javawebinar.topjava.web.user.AdminRestController" id="adminRestController">
+    </bean>
+
     <context:component-scan base-package="ru.javawebinar.**.repository.inmemory"/>
-    <context:component-scan base-package="ru.javawebinar.**.service"/>
-    <context:component-scan base-package="ru.javawebinar.**.web.user"/>
+
 </beans>
