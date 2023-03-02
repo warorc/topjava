@@ -2,21 +2,26 @@ package ru.javawebinar.topjava.model;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 @NamedQueries({
-        @NamedQuery(name = Meal.DELETE, query = "DELETE from Meal m WHERE m.id=:id AND User.id=:userId"),
+        @NamedQuery(name = Meal.DELETE, query = "DELETE from Meal m WHERE m.id=:id AND m.user.id=:userId"),
         @NamedQuery(name = Meal.ALL_SORTED,
-                query = "SELECT m FROM Meal m WHERE User.id=:userId ORDER BY m.dateTime DESC"
+                query = "SELECT m FROM Meal m WHERE m.user.id=:userId ORDER BY m.dateTime DESC"
+        ),
+        @NamedQuery(name = Meal.BY_ID,
+                query = "SELECT m FROM Meal m WHERE m.user.id=:userId AND m.id=:id"
+        ),
+        @NamedQuery(name = Meal.BY_USER_ID,
+                query = "SELECT m FROM Meal m WHERE m.user.id=:userId"
         ),
         @NamedQuery(
                 name = Meal.BETWEEN_DATE_TIME,
-                query = "SELECT m FROM Meal m where User.id=:userId " +
-                        "AND m.dateTime >= ?1 AND m.dateTime <= ?2 ORDER BY m.dateTime DESC"
+                query = "SELECT m FROM Meal m where m.user.id=:userId " +
+                        "AND m.dateTime >= ?1 AND m.dateTime < ?2 ORDER BY m.dateTime DESC"
         )
 
 })
@@ -26,6 +31,8 @@ public class Meal extends AbstractBaseEntity {
     public static final String DELETE = "Meal.delete";
     public static final String ALL_SORTED = "Meal.getAllSorted";
     public static final String BETWEEN_DATE_TIME = "Meal.getBetweenDateTime";
+    public static final String BY_USER_ID = "Meal.getByUserId";
+    public static final String BY_ID = "Meal.getById";
 
     @Column(name = "date_time", nullable = false, unique = true)
     @NotNull
