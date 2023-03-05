@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava;
 
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 
 import java.time.Month;
 import java.time.temporal.ChronoUnit;
@@ -11,6 +12,8 @@ import static ru.javawebinar.topjava.model.AbstractBaseEntity.START_SEQ;
 
 public class MealTestData {
     public static final MatcherFactory.Matcher<Meal> MEAL_MATCHER = MatcherFactory.usingIgnoringFieldsComparator("user");
+
+    public static final MatcherFactory.Matcher<Meal> MEAL_WITH_USER_MATCHER = MatcherFactory.usingIgnoringFieldsComparator("user.role", "user.meals", "user.registered");
 
     public static final int NOT_FOUND = 10;
     public static final int MEAL1_ID = START_SEQ + 3;
@@ -27,6 +30,15 @@ public class MealTestData {
     public static final Meal adminMeal2 = new Meal(ADMIN_MEAL_ID + 1, of(2020, Month.JANUARY, 31, 21, 0), "Админ ужин", 1500);
 
     public static final List<Meal> meals = List.of(meal7, meal6, meal5, meal4, meal3, meal2, meal1);
+
+    static {
+        meal1.setUser(UserTestData.admin);
+    }
+
+    public static Meal setUserData(Meal meal, User user) {
+        meal.setUser(user);
+        return meal;
+    }
 
     public static Meal getNew() {
         return new Meal(null, of(2020, Month.FEBRUARY, 1, 18, 0), "Созданный ужин", 300);

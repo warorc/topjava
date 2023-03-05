@@ -3,10 +3,10 @@ package ru.javawebinar.topjava.service;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.CacheManager;
 import org.springframework.dao.DataAccessException;
-import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
@@ -19,6 +19,7 @@ import ru.javawebinar.topjava.util.exception.NotFoundException;
 import java.util.List;
 
 import static org.junit.Assert.assertThrows;
+import static org.slf4j.LoggerFactory.getLogger;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 @ContextConfiguration({
@@ -28,11 +29,14 @@ import static ru.javawebinar.topjava.UserTestData.*;
 @RunWith(SpringRunner.class)
 @Sql(scripts = "classpath:db/populateDB.sql", config = @SqlConfig(encoding = "UTF-8"))
 //@ActiveProfiles(resolver = ActiveDbProfileResolver.class)
-@ActiveProfiles({"hsqldb", "datajpa"})
-public class UserServiceTest {
+abstract public class UserServiceTest {
+
+    private static final Logger log = getLogger("result");
+
+    private static final StringBuilder results = new StringBuilder();
 
     @Autowired
-    private UserService service;
+    public UserService service;
 
     @Autowired
     private CacheManager cacheManager;
