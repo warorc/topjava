@@ -56,7 +56,7 @@ public class User extends AbstractNamedEntity {
 
     @OneToMany(mappedBy = "user")
     @OrderBy("dateTime desc")
-    private List<Meal> meals = new ArrayList<>();
+    private List<Meal> meals;
 
     public User() {
     }
@@ -83,7 +83,6 @@ public class User extends AbstractNamedEntity {
         this.registered = registered;
         setRoles(roles);
     }
-
 
     public String getEmail() {
         return email;
@@ -127,6 +126,10 @@ public class User extends AbstractNamedEntity {
 
     private void setMeals(List<Meal> meals) {
         this.meals = meals;
+    }
+
+    public List<Meal> getMeals() {
+        return meals;
     }
 
     public void setRoles(Collection<Role> roles) {

@@ -19,7 +19,7 @@ public interface MealRepository {
     List<Meal> getAll(int userId);
 
     default Meal getWithUser(int id, int userId) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     // ORDERED dateTime desc
