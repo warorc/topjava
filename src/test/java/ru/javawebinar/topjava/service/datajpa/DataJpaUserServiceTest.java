@@ -16,8 +16,7 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.UserTestData.*;
 
-
-@ActiveProfiles({Profiles.DATAJPA})
+@ActiveProfiles(Profiles.DATAJPA)
 public class DataJpaUserServiceTest extends UserServiceTest {
 
     @Test
@@ -29,14 +28,14 @@ public class DataJpaUserServiceTest extends UserServiceTest {
     }
 
     @Test
-    public void getWithoutMeals() {
+    public void getWithEmptyMeals() {
         User user = service.getWithMeals(GUEST_ID);
         USER_MATCHER.assertMatch(user, UserTestData.guest);
         assert (user.getMeals().isEmpty());
     }
 
     @Test
-    public void getNonExistedUsert() {
+    public void getWithMealsNonExistedUser() {
         assertThrows(NotFoundException.class, () -> service.getWithMeals(UserTestData.NOT_FOUND));
     }
 }

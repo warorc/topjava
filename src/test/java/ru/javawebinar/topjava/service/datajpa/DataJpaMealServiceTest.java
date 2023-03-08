@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThrows;
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.*;
 
-@ActiveProfiles({Profiles.DATAJPA})
+@ActiveProfiles(Profiles.DATAJPA)
 public class DataJpaMealServiceTest extends MealServiceTest {
 
     @Test
@@ -26,7 +26,7 @@ public class DataJpaMealServiceTest extends MealServiceTest {
     }
 
     @Test
-    public void getWithoutUser() {
+    public void getNotOwnWithUser() {
         assertThrows(NotFoundException.class, () -> service.getWithUser(ADMIN_MEAL_ID, USER_ID));
     }
 

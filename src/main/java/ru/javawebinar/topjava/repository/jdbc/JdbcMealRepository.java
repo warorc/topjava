@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.repository.jdbc;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,15 +15,14 @@ import java.util.List;
 
 public abstract class JdbcMealRepository<T> implements MealRepository {
 
-    protected static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
+    private static final RowMapper<Meal> ROW_MAPPER = BeanPropertyRowMapper.newInstance(Meal.class);
 
-    protected final JdbcTemplate jdbcTemplate;
+    private final JdbcTemplate jdbcTemplate;
 
-    protected final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    protected final SimpleJdbcInsert insertMeal;
+    private final SimpleJdbcInsert insertMeal;
 
-    @Autowired
     protected JdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         this.insertMeal = new SimpleJdbcInsert(jdbcTemplate)
                 .withTableName("meal")
@@ -36,12 +34,11 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
 
     @Override
     public Meal save(Meal meal, int userId) {
-        T properDateTime = setProperDateTime(meal.getDateTime());
         MapSqlParameterSource map = new MapSqlParameterSource()
                 .addValue("id", meal.getId())
                 .addValue("description", meal.getDescription())
                 .addValue("calories", meal.getCalories())
-                .addValue("date_time", properDateTime)
+                .addValue("date_time", convertToProperDateTime(meal.getDateTime()))
                 .addValue("user_id", userId);
 
         if (meal.isNew()) {
@@ -58,7 +55,7 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
         return meal;
     }
 
-    abstract T setProperDateTime(LocalDateTime localDateTime);
+    abstract T convertToProperDateTime(LocalDateTime localDateTime);
 
     @Override
     public boolean delete(int id, int userId) {
@@ -80,10 +77,8 @@ public abstract class JdbcMealRepository<T> implements MealRepository {
 
     @Override
     public List<Meal> getBetweenHalfOpen(LocalDateTime startDateTime, LocalDateTime endDateTime, int userId) {
-        T properStartDateTime = setProperDateTime(startDateTime);
-        T properEndDateTime = setProperDateTime(endDateTime);
         return jdbcTemplate.query(
                 "SELECT * FROM meal WHERE user_id=?  AND date_time >=  ? AND date_time < ? ORDER BY date_time DESC",
-                ROW_MAPPER, userId, properStartDateTime, properEndDateTime);
+                ROW_MAPPER, userId, convertToProperDateTime(startDateTime), convertToProperDateTime(endDateTime));
     }
 }

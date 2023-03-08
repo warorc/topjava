@@ -10,14 +10,14 @@ import java.time.LocalDateTime;
 
 @Repository
 @Profile(Profiles.POSTGRES_DB)
-public class PostgresJdbcMealRepository<T extends LocalDateTime> extends JdbcMealRepository {
+public class PostgresJdbcMealRepository extends JdbcMealRepository<LocalDateTime> {
 
     public PostgresJdbcMealRepository(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedParameterJdbcTemplate) {
         super(jdbcTemplate, namedParameterJdbcTemplate);
     }
 
     @Override
-    LocalDateTime setProperDateTime(LocalDateTime localDateTime) {
+    LocalDateTime convertToProperDateTime(LocalDateTime localDateTime) {
         return localDateTime;
     }
 
