@@ -3,7 +3,6 @@ package ru.javawebinar.topjava.service;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.env.Environment;
 import org.springframework.dao.DataAccessException;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
@@ -23,13 +22,10 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     @Autowired
     protected MealService service;
 
-    @Autowired
-    private Environment environment;
-
     @Test
     public void delete() {
-        service.delete(MEAL1_ID, USER_ID);
-        assertThrows(NotFoundException.class, () -> service.get(MEAL1_ID, USER_ID));
+        service.delete(ADMIN_MEAL_ID, ADMIN_ID);
+        assertThrows(NotFoundException.class, () -> service.get(ADMIN_MEAL_ID, ADMIN_ID));
     }
 
     @Test
@@ -44,18 +40,18 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Test
     public void create() {
-        Meal created = service.create(getNew(), USER_ID);
+        Meal created = service.create(getNew(), ADMIN_ID);
         int newId = created.id();
         Meal newMeal = getNew();
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
-        MEAL_MATCHER.assertMatch(service.get(newId, USER_ID), newMeal);
+        MEAL_MATCHER.assertMatch(service.get(newId, ADMIN_ID), newMeal);
     }
 
     @Test
     public void duplicateDateTimeCreate() {
         assertThrows(DataAccessException.class, () ->
-                service.create(new Meal(null, meal1.getDateTime(), "duplicate", 100), USER_ID));
+                service.create(new Meal(null, adminMeal1.getDateTime(), "duplicate", 100), ADMIN_ID));
     }
 
     @Test
@@ -77,20 +73,20 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
     @Test
     public void update() {
         Meal updated = getUpdated();
-        service.update(updated, USER_ID);
-        MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), getUpdated());
+        service.update(updated, ADMIN_ID);
+        MEAL_MATCHER.assertMatch(service.get(ADMIN_MEAL_ID, ADMIN_ID), getUpdated());
     }
 
     @Test
     public void updateNotOwn() {
-        NotFoundException exception = assertThrows(NotFoundException.class, () -> service.update(getUpdated(), ADMIN_ID));
-        Assert.assertEquals("Not found entity with id=" + MEAL1_ID, exception.getMessage());
+        NotFoundException exception = assertThrows(NotFoundException.class, () -> service.update(getUpdated(), USER_ID));
+        Assert.assertEquals("Not found entity with id=" + ADMIN_MEAL_ID, exception.getMessage());
         MEAL_MATCHER.assertMatch(service.get(MEAL1_ID, USER_ID), meal1);
     }
 
     @Test
     public void getAll() {
-        MEAL_MATCHER.assertMatch(service.getAll(USER_ID), meals);
+        MEAL_MATCHER.assertMatch(service.getAll(ADMIN_ID), adminMeals);
     }
 
     @Test
@@ -103,12 +99,11 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
 
     @Test
     public void getBetweenWithNullDates() {
-        MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, USER_ID), meals);
+        MEAL_MATCHER.assertMatch(service.getBetweenInclusive(null, null, ADMIN_ID), adminMeals);
     }
 
     @Test
     public void createWithException() throws Exception {
-//        Assume.assumeTrue(Arrays.stream(environment.getActiveProfiles()).noneMatch("jdbc"::contains));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "  ", 300), USER_ID));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, null, "Description", 300), USER_ID));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "Description", 9), USER_ID));

@@ -4,15 +4,12 @@
 <%@ taglib prefix="fn" uri="http://topjava.javawebinar.ru/functions" %>
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
-<head>
-    <title>Meals</title>
-</head>
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
     <hr/>
     <h2>Meals</h2>
-    <form method="post" action="meals">
+    <form method="get" action="${pageContext.request.contextPath}/meals/filter">
         <input type="hidden" name="action" value="filter">
         <dl>
             <dt>From Date (inclusive):</dt>

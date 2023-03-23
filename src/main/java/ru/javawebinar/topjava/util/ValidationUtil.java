@@ -6,9 +6,19 @@ import org.springframework.lang.NonNull;
 import ru.javawebinar.topjava.model.AbstractBaseEntity;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
 public class ValidationUtil {
 
     private ValidationUtil() {
+    }
+
+    public static Validator getValidator() {
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            return factory.getValidator();
+        }
     }
 
     public static <T> T checkNotFoundWithId(T object, int id) {

@@ -1,8 +1,5 @@
 package ru.javawebinar.topjava.web;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,37 +21,37 @@ import static ru.javawebinar.topjava.util.DateTimeUtil.parseLocalTime;
 
 @Controller
 @RequestMapping("/meals")
-public class JspMealController {
-    private static Logger log = LoggerFactory.getLogger(JspMealController.class);
+public class JspMealController extends AbstractMealController {
 
-    @Autowired
-    MealService service;
+    public JspMealController(MealService service) {
+        super(service);
+    }
 
-    @GetMapping()
+    @GetMapping
     public String get(Model model, HttpServletRequest request) {
         log.info("meals");
         model.addAttribute("meals", MealsUtil.getTos(
-                service.getAll(SecurityUtil.authUserId()),
+                getAll(),
                 SecurityUtil.authUserCaloriesPerDay())
         );
         return "meals";
     }
 
     @GetMapping("/delete/{id}")
-    public String delete(@PathVariable int id) {
+    public String deleteMeal(@PathVariable int id) {
         log.info("delete meal {} for user {}", id, SecurityUtil.authUserId());
-        service.delete(id, SecurityUtil.authUserId());
+        super.delete(id);
         return "redirect:/meals";
     }
 
-    @PostMapping()
+    @GetMapping("/filter")
     public String filter(Model model, HttpServletRequest request) {
         log.info("filter");
         LocalDate startDate = parseLocalDate(request.getParameter("startDate"));
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
         LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
         LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
-        List<Meal> mealsDateFiltered = service.getBetweenInclusive(startDate, endDate, SecurityUtil.authUserId());
+        List<Meal> mealsDateFiltered = getBetweenInclusive(startDate, endDate);
         model.addAttribute(
                 "meals",
                 MealsUtil.getFilteredTos(
@@ -69,27 +66,26 @@ public class JspMealController {
 
     @GetMapping("/update/{id}")
     public String updateForm(@PathVariable int id, Model model) {
+        model.addAttribute("meal", get(id));
         log.info("redirect to update form for meal {}", id);
-        model.addAttribute("meal", service.get(id, SecurityUtil.authUserId()));
         return "mealForm";
     }
 
     @GetMapping("/create")
     public String createForm(Model model) {
-        log.info("redirect to create form ");
         model.addAttribute("meal", new Meal());
+        log.info("redirect to create form ");
         return "mealForm";
     }
 
     @PostMapping("/update/{id}")
     public String update(HttpServletRequest request, @PathVariable int id) {
         log.info("update meal {} for user {}", id, SecurityUtil.authUserId());
-        service.update(new Meal(
-                        id,
-                        LocalDateTime.parse(request.getParameter("dateTime")),
-                        request.getParameter("description"),
-                        Integer.parseInt(request.getParameter("calories"))),
-                SecurityUtil.authUserId()
+        update(new Meal(
+                id,
+                LocalDateTime.parse(request.getParameter("dateTime")),
+                request.getParameter("description"),
+                Integer.parseInt(request.getParameter("calories")))
         );
         return "redirect:/meals";
     }
@@ -97,11 +93,10 @@ public class JspMealController {
     @PostMapping("/create")
     public String create(HttpServletRequest request) {
         log.info("create meal for user {}", SecurityUtil.authUserId());
-        service.create(new Meal(
-                        LocalDateTime.parse(request.getParameter("dateTime")),
-                        request.getParameter("description"),
-                        Integer.parseInt(request.getParameter("calories"))),
-                SecurityUtil.authUserId()
+        create(new Meal(
+                LocalDateTime.parse(request.getParameter("dateTime")),
+                request.getParameter("description"),
+                Integer.parseInt(request.getParameter("calories")))
         );
         return "redirect:/meals";
     }

@@ -1,18 +1,15 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <html>
 <jsp:include page="fragments/headTag.jsp"/>
-<head>
-    <title>Meal</title>
-</head>
 <body>
 <jsp:include page="fragments/bodyHeader.jsp"/>
 <section>
     <hr>
-<%--    <h2>${fn:contains(requestScope['javax.servlet.forward.request_uri'], 'create') ? 'Create meal' : 'Edit meal'}</h2>--%>
+    <h2>${meal.id == null ? 'Create meal' : 'Edit meal'}</h2>
     <jsp:useBean id="meal" type="ru.javawebinar.topjava.model.Meal" scope="request"/>
     <form method="post" action="${meal.id}">
         <input type="hidden" name="id" value="${meal.id}">
