@@ -1,14 +1,12 @@
 package ru.javawebinar.topjava.web.user;
 
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.EnabledIf;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.User;
-import ru.javawebinar.topjava.service.UserService;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.json.JsonUtil;
@@ -19,15 +17,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.javawebinar.topjava.MealTestData.MEAL_MATCHER;
 import static ru.javawebinar.topjava.MealTestData.meals;
-import static ru.javawebinar.topjava.Profiles.DATAJPA;
 import static ru.javawebinar.topjava.UserTestData.*;
 
 class AdminRestControllerTest extends AbstractControllerTest {
-
     private static final String REST_URL = AdminRestController.REST_URL + '/';
-
-    @Autowired
-    private UserService userService;
 
     @Test
     void get() throws Exception {
@@ -90,8 +83,8 @@ class AdminRestControllerTest extends AbstractControllerTest {
     }
 
     @Test
-    @EnabledIf(value = "#{environment.acceptsProfiles('" + DATAJPA + "')}", loadContext = true)
     void getWithMeals() throws Exception {
+        Assumptions.assumeTrue(isActiveProfileDataJpa());
         ResultActions actions = perform(MockMvcRequestBuilders.get(REST_URL + USER_ID + "/with-meals"))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -99,7 +92,6 @@ class AdminRestControllerTest extends AbstractControllerTest {
 
         User userFromJson = USER_MATCHER.readFromJson(actions);
         USER_MATCHER.assertMatch(userFromJson, user);
-        System.out.println(userFromJson.getMeals());
         MEAL_MATCHER.assertMatch(userFromJson.getMeals(), meals);
     }
 }

@@ -72,7 +72,17 @@ public class MealTo {
         if (obj.getClass() != this.getClass()) {
             return false;
         }
+
         MealTo object = (MealTo) obj;
+        if (
+                object.getDateTime() == null
+                        || object.getDescription() == null
+                        || this.dateTime == null
+                        || this.description == null
+        ) {
+            return false;
+        }
+
         return Objects.equals(this.id, object.getId())
                 && this.dateTime.equals(object.getDateTime())
                 && this.description.equals(object.getDescription())
