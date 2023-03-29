@@ -6,12 +6,12 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import ru.javawebinar.topjava.MealTestData;
+import ru.javawebinar.topjava.UserTestData;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 import ru.javawebinar.topjava.web.AbstractControllerTest;
-import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
 import java.util.List;
@@ -36,7 +36,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(meals, SecurityUtil.authUserCaloriesPerDay())));
+                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(meals, MealsUtil.DEFAULT_CALORIES_PER_DAY)));
     }
 
     @Test
@@ -51,21 +51,31 @@ public class MealRestControllerTest extends AbstractControllerTest {
     @Test
     void getBetween() throws Exception {
         List<Meal> expectedMealList = List.of(meal3, meal2);
-        perform(MockMvcRequestBuilders.get(REST_URL + "/filter?startLocalDate=2020-01-30&startLocalTime=13:00&endLocalDate=2020-01-30&endLocalTime=21:00"))
+        perform(MockMvcRequestBuilders.get(REST_URL + "/filter")
+                .param("startLocalDate", "2020-01-30")
+                .param("startLocalTime", "13:00")
+                .param("endLocalDate", "2020-01-30")
+                .param("endLocalTime", "21:00")
+        )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(expectedMealList, SecurityUtil.authUserCaloriesPerDay())));
+                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(expectedMealList, MealsUtil.DEFAULT_CALORIES_PER_DAY)));
     }
 
     @Test
     void getBetweenWithEmptyTime() throws Exception {
         List<Meal> expectedMealList = List.of(meal3, meal2);
-        perform(MockMvcRequestBuilders.get(REST_URL + "/filter?startLocalDate=2020-01-30&startLocalTime=13:00&endLocalDate=2020-01-30&endLocalTime="))
+        perform(MockMvcRequestBuilders.get(REST_URL + "/filter")
+                .param("startLocalDate", "2020-01-30")
+                .param("startLocalTime", "13:00")
+                .param("endLocalDate", "2020-01-30")
+                .param("endLocalTime", "")
+        )
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(expectedMealList, SecurityUtil.authUserCaloriesPerDay())));
+                .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getTos(expectedMealList, MealsUtil.DEFAULT_CALORIES_PER_DAY)));
     }
 
     @Test
@@ -80,7 +90,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
         int newId = created.id();
         newMeal.setId(newId);
         MEAL_MATCHER.assertMatch(created, newMeal);
-        MEAL_MATCHER.assertMatch(mealService.get(newId, SecurityUtil.authUserId()), newMeal);
+        MEAL_MATCHER.assertMatch(mealService.get(newId, UserTestData.USER_ID), newMeal);
     }
 
     @Test
@@ -92,7 +102,7 @@ public class MealRestControllerTest extends AbstractControllerTest {
                 .content(JsonUtil.writeValue(updated)))
                 .andExpect(status().isNoContent());
 
-        MEAL_MATCHER.assertMatch(mealService.get(MEAL1_ID, SecurityUtil.authUserId()), updated);
+        MEAL_MATCHER.assertMatch(mealService.get(MEAL1_ID, UserTestData.USER_ID), updated);
     }
 
     @Test
@@ -100,6 +110,6 @@ public class MealRestControllerTest extends AbstractControllerTest {
         perform(MockMvcRequestBuilders.delete(REST_URL + MEAL1_ID))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        assertThrows(NotFoundException.class, () -> mealService.get(MEAL1_ID, SecurityUtil.authUserId()));
+        assertThrows(NotFoundException.class, () -> mealService.get(MEAL1_ID, UserTestData.USER_ID));
     }
 }

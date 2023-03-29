@@ -35,7 +35,7 @@ class RootControllerTest extends AbstractControllerTest {
 
     @Test
     void getMeals() throws Exception {
-        List<MealTo> expected = MealsUtil.getTos(meals, SecurityUtil.authUserCaloriesPerDay());
+        List<MealTo> expected = MealsUtil.getTos(meals, MealsUtil.DEFAULT_CALORIES_PER_DAY);
         perform(get("/meals"))
                 .andDo(print())
                 .andExpect(status().isOk())

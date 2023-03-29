@@ -18,7 +18,13 @@ public class MealTo {
     private final boolean excess;
 
     @JsonCreator
-    public MealTo(@JsonProperty("id") Integer id, @JsonProperty("dateTime") LocalDateTime dateTime, @JsonProperty("description") String description, @JsonProperty("calories") int calories, @JsonProperty("excess") boolean excess) {
+    public MealTo(
+            @JsonProperty("id") Integer id,
+            @JsonProperty("dateTime") LocalDateTime dateTime,
+            @JsonProperty("description") String description,
+            @JsonProperty("calories") int calories,
+            @JsonProperty("excess") boolean excess
+    ) {
         this.id = id;
         this.dateTime = dateTime;
         this.description = description;
@@ -62,16 +68,15 @@ public class MealTo {
         if (obj == null) {
             return false;
         }
+
         if (obj.getClass() != this.getClass()) {
             return false;
         }
-
         MealTo object = (MealTo) obj;
-
         return Objects.equals(this.id, object.getId())
                 && this.dateTime.equals(object.getDateTime())
                 && this.description.equals(object.getDescription())
-                && this.calories == object.getCalories()
+                && this.calories == (object.getCalories())
                 && this.excess == (object.isExcess());
     }
 }
