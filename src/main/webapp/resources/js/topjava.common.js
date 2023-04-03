@@ -25,7 +25,7 @@ function add() {
 function deleteRow(id) {
     $.ajax({
         url: ctx.ajaxUrl + id,
-        type: "DELETE"
+        type: "DELETE",
     }).done(function () {
         updateTable();
         successNoty("Deleted");
