@@ -38,14 +38,18 @@ function updateTable() {
     });
 }
 
-function save() {
+function updateTableWithNewData(data) {
+    ctx.datatableApi.clear().rows.add(data).draw();
+}
+
+function save(updateFunction = updateTable) {
     $.ajax({
         type: "POST",
         url: ctx.ajaxUrl,
         data: form.serialize()
     }).done(function () {
         $("#editRow").modal("hide");
-        updateTable();
+        updateFunction();
         successNoty("Saved");
     });
 }

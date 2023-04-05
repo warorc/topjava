@@ -49,4 +49,10 @@ public class UserTestData {
         updated.setRoles(Collections.singletonList(Role.ADMIN));
         return updated;
     }
+
+    public static User getNotActive() {
+        User notActive = new User(user);
+        notActive.setEnabled(false);
+        return notActive;
+    }
 }

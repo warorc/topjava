@@ -45,3 +45,21 @@ $(function () {
         })
     );
 });
+
+function activateUser(element, id) {
+    $.ajax({
+        url: ctx.ajaxUrl + "activate",
+        type: "POST",
+        data: {
+            id: id,
+            checked: element[0].checked,
+        }
+    }).done(function () {
+        updateTable();
+        if (element[0].checked) {
+            successNoty("User activated")
+        } else {
+            successNoty("User deactivated")
+        }
+    });
+}
