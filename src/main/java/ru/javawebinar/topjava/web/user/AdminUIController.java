@@ -3,8 +3,10 @@ package ru.javawebinar.topjava.web.user;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
+import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import java.util.List;
 
@@ -36,6 +38,10 @@ public class AdminUIController extends AbstractUserController {
     @PostMapping(value = "/activate")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void enable(@RequestParam boolean checked, @RequestParam int id) {
-        super.enable(checked, id);
+        try {
+            super.enable(checked, id);
+        } catch (NotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.UNPROCESSABLE_ENTITY);
+        }
     }
 }

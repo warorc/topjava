@@ -46,7 +46,7 @@ function saveMeal() {
 
 function returnFilteredResult() {
     $.ajax({
-        url: ctx.ajaxUrl + "filter",
+        url: ctx.filterAjaxUrl,
         type: "GET",
         data: timeFilterForm.serialize(),
     }).done(function (data) {

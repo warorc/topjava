@@ -23,17 +23,4 @@ class DataJpaUserServiceTest extends AbstractUserServiceTest {
         Assertions.assertThrows(NotFoundException.class,
                 () -> service.getWithMeals(NOT_FOUND));
     }
-
-    @Test
-    void enabled() {
-        service.enable(false, USER_ID);
-        User actual = service.get(USER_ID);
-        USER_MATCHER.assertMatch(actual, getNotActive());
-    }
-
-    @Test
-    void wrongEnabled() {
-        Assertions.assertThrows(NotFoundException.class,
-                () -> service.enable(false, NOT_FOUND));
-    }
 }
