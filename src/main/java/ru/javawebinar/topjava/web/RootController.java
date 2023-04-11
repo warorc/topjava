@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
 
+
 @Controller
 public class RootController {
     private static final Logger log = LoggerFactory.getLogger(RootController.class);
