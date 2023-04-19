@@ -44,6 +44,12 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
+        if (e.getMessage().contains("users_unique_email_idx")) {
+            e = new DataIntegrityViolationException(messageSourceAccessor.getMessage("user.duplicateEmailError"));
+        }
+        if (e.getMessage().contains("meal_unique_user_datetime_idx")) {
+            e = new DataIntegrityViolationException(messageSourceAccessor.getMessage("meal.duplicateDateTimeError"));
+        }
         return logAndGetErrorInfo(req, e, true, DATA_ERROR);
     }
 
@@ -72,12 +78,6 @@ public class ExceptionInfoHandler {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
             log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
-        }
-        if (rootCause.getMessage().contains("users_unique_email_idx")) {
-            return new ErrorInfo(req.getRequestURL(), errorType, messageSourceAccessor.getMessage("user.duplicateEmailError"));
-        }
-        if (rootCause.getMessage().contains("meal_unique_user_datetime_idx")) {
-            return new ErrorInfo(req.getRequestURL(), errorType, messageSourceAccessor.getMessage("meal.duplicateDateTimeError"));
         }
         return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
     }

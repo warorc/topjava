@@ -23,7 +23,7 @@ public class ProfileUIController extends AbstractUserController {
     }
 
     @PostMapping
-    public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status, ModelMap model) {
+    public String updateProfile(@Valid UserTo userTo, BindingResult result, SessionStatus status) {
         if (result.hasErrors()) {
             return "profile";
         } else {

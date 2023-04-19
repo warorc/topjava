@@ -129,8 +129,6 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isUnprocessableEntity());
     }
 
-    ;
-
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createWithLocationDuplicateDateTime() throws Exception {
@@ -142,8 +140,6 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(content().string(containsString("Meal with such Date/Time already exists")));
     }
-
-    ;
 
     @Test
     void getAll() throws Exception {
