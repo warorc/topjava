@@ -4,6 +4,10 @@
 <%@taglib prefix="form" uri="http://www.springframework.org/tags/form" %>
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark py-0">
+    <script type="text/javascript">
+        var localeCode = <spring:message
+                code="common.locale"/>;
+    </script>
     <div class="container">
         <a href="meals" class="navbar-brand"><img src="resources/images/icon-meal.png"> <spring:message
                 code="app.title"/></a>
@@ -36,8 +40,8 @@
                 <li class="nav-item dropdown">
                     <a class="dropdown-toggle nav-link my-1 ml-2" data-toggle="dropdown"><spring:message code="common.locale"/></a>
                     <div class="dropdown-menu">
-                        <a class="dropdown-item" href="${requestScope['javax.servlet.forward.request_uri']}?lang=en">English</a>
-                        <a class="dropdown-item" href="${requestScope['javax.servlet.forward.request_uri']}?lang=ru">Русский</a>
+                        <a id="english" class="dropdown-item" href="${requestScope['javax.servlet.forward.request_uri']}?lang=en">English</a>
+                        <a id="russian" class="dropdown-item" href="${requestScope['javax.servlet.forward.request_uri']}?lang=ru">Русский</a>
                     </div>
                 </li>
             </ul>
