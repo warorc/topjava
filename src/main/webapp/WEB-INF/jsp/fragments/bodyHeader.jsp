@@ -5,8 +5,8 @@
 
 <nav class="navbar navbar-expand-md navbar-dark bg-dark py-0">
     <script type="text/javascript">
-        var localeCode = <spring:message
-                code="common.locale"/>;
+        var localeCode = "<spring:message
+                code="common.locale"/>";
     </script>
     <div class="container">
         <a href="meals" class="navbar-brand"><img src="resources/images/icon-meal.png"> <spring:message

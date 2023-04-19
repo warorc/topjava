@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.util;
 
 
 import org.springframework.core.NestedExceptionUtils;
-import org.springframework.http.ResponseEntity;
 import org.springframework.lang.NonNull;
 import org.springframework.validation.BindingResult;
 import ru.javawebinar.topjava.HasId;
@@ -10,8 +9,8 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.validation.*;
+import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ValidationUtil {
 
@@ -77,11 +76,13 @@ public class ValidationUtil {
         return rootCause != null ? rootCause : t;
     }
 
-    public static ResponseEntity<String> getErrorResponse(BindingResult result) {
-        return ResponseEntity.unprocessableEntity().body(
-                result.getFieldErrors().stream()
-                        .map(fe -> String.format("[%s] %s", fe.getField(), fe.getDefaultMessage()))
-                        .collect(Collectors.joining("<br>"))
-        );
+    public static List<Exception> getErrorsList(Exception... t) {
+        return List.of(t);
+    }
+
+    public static List<Exception> getErrorResponse(BindingResult result) {
+        return result.getFieldErrors().stream()
+                .map(fe -> new Exception(String.format("[%s] %s", fe.getField(), fe.getDefaultMessage())))
+                .toList();
     }
 }

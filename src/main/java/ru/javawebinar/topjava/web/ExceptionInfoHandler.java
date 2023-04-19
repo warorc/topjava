@@ -9,6 +9,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,6 +23,7 @@ import ru.javawebinar.topjava.util.exception.IllegalRequestDataException;
 import ru.javawebinar.topjava.util.exception.NotFoundException;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 import static ru.javawebinar.topjava.util.exception.ErrorType.*;
 
@@ -38,47 +40,58 @@ public class ExceptionInfoHandler {
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(NotFoundException.class)
     public ErrorInfo notFoundError(HttpServletRequest req, NotFoundException e) {
-        return logAndGetErrorInfo(req, e, false, DATA_NOT_FOUND);
+        return logAndGetErrorInfo(req, ValidationUtil.getErrorsList(e), false, DATA_NOT_FOUND);
     }
 
     @ResponseStatus(HttpStatus.CONFLICT)  // 409
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ErrorInfo conflict(HttpServletRequest req, DataIntegrityViolationException e) {
-        if (e.getMessage().contains("users_unique_email_idx")) {
+        if (e.getRootCause().getMessage().toLowerCase().contains("users_unique_email_idx")) {
             e = new DataIntegrityViolationException(messageSourceAccessor.getMessage("user.duplicateEmailError"));
-        }
-        if (e.getMessage().contains("meal_unique_user_datetime_idx")) {
+        } else if (e.getRootCause().getMessage().toLowerCase().contains("meal_unique_user_datetime_idx")) {
             e = new DataIntegrityViolationException(messageSourceAccessor.getMessage("meal.duplicateDateTimeError"));
         }
-        return logAndGetErrorInfo(req, e, true, DATA_ERROR);
+        return logAndGetErrorInfo(req, ValidationUtil.getErrorsList(e), true, DATA_ERROR);
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)  // 422
-    @ExceptionHandler({IllegalRequestDataException.class, MethodArgumentTypeMismatchException.class, HttpMessageNotReadableException.class})
+    @ExceptionHandler({IllegalRequestDataException.class,
+            MethodArgumentTypeMismatchException.class,
+            HttpMessageNotReadableException.class,
+            BindException.class
+    })
     public ErrorInfo validationError(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, false, VALIDATION_ERROR);
+        List<Exception> errorsList;
+        if (e instanceof BindException) {
+            errorsList = ValidationUtil.getErrorResponse(((BindException) e).getBindingResult());
+        } else {
+            errorsList = ValidationUtil.getErrorsList(e);
+        }
+        return logAndGetErrorInfo(req, errorsList, false, VALIDATION_ERROR);
     }
+
 
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     @ExceptionHandler(Exception.class)
     public ErrorInfo internalError(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, true, APP_ERROR);
+        return logAndGetErrorInfo(req, ValidationUtil.getErrorsList(e), true, APP_ERROR);
     }
 
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ErrorInfo handleMethodArgumentNotValidException(HttpServletRequest req, MethodArgumentNotValidException error) {
-        return logAndGetErrorInfo(req, error, false, VALIDATION_ERROR);
+    public ErrorInfo handleMethodArgumentNotValidException(HttpServletRequest req, MethodArgumentNotValidException e) {
+        return logAndGetErrorInfo(req, ValidationUtil.getErrorsList(e), false, VALIDATION_ERROR);
     }
 
     //    https://stackoverflow.com/questions/538870/should-private-helper-methods-be-static-if-they-can-be-static
-    private ErrorInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, ErrorType errorType) {
-        Throwable rootCause = ValidationUtil.getRootCause(e);
+    private ErrorInfo logAndGetErrorInfo(HttpServletRequest req, List<Exception> e, boolean logException, ErrorType errorType) {
+        List<Throwable> rootCause = e.stream().map(k -> ValidationUtil.getRootCause(k)).toList();
         if (logException) {
             log.error(errorType + " at request " + req.getRequestURL(), rootCause);
         } else {
-            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause.toString());
+            log.warn("{} at request  {}: {}", errorType, req.getRequestURL(), rootCause);
         }
-        return new ErrorInfo(req.getRequestURL(), errorType, rootCause.getMessage());
+        List<String> detail = rootCause.stream().map(Throwable::getMessage).toList();
+        return new ErrorInfo(req.getRequestURL(), errorType, detail);
     }
 }
